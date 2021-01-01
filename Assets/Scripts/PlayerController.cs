@@ -4,23 +4,27 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Start() variables
     private Rigidbody2D rb;
     private Animator anim;
-    private enum State {idle, running, jumping, falling}
+
+    // FSM
+    private enum State { idle, running, jumping, falling }
     private State state = State.idle;
     private Collider2D coll;
+
+    // Inspector variables
     [SerializeField] private LayerMask ground;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private float jumpForce = 7f;
 
 
-    // setting variables
-    public float movementSpeed = 5;
-    public float jumpForce = 7;
     /*
     // better control settings
-    public float speed = 10;
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
     */
+
 
     // Start is called before the first frame update
     private void Start()
@@ -34,31 +38,37 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        Movement();
+        
+        AnimationState();
+        anim.SetInteger("state", (int)state);
+    }
 
+
+    // Handles inputs of the user
+    private void Movement()
+    {
+
+        // basic player controls
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
 
-        // basic player controls
-        if (xAxis < 0) 
+        if (xAxis < 0)
         {
-            rb.velocity = new Vector2(-movementSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(-speed, rb.velocity.y);
             gameObject.GetComponent<SpriteRenderer>().flipX = true;
         }
         else if (xAxis > 0)
         {
-            rb.velocity = new Vector2(movementSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(speed, rb.velocity.y);
             gameObject.GetComponent<SpriteRenderer>().flipX = false;
         }
-        else
-        {
-            
-        }
+
         if (Input.GetButtonDown("Jump") && coll.IsTouchingLayers(ground))
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             state = State.jumping;
         }
-
 
         /*
         // better controls from "mix & jam"
@@ -84,25 +94,29 @@ public class PlayerController : MonoBehaviour
             rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
         */
-        VelocityState();
-        anim.SetInteger("state", (int)state);
+
     }
 
-    private void VelocityState()
+
+    // Changes animation states according to the player
+    private void AnimationState()
     {
         if (state == State.jumping)
         {
-            if (rb.velocity.y < .1f){
+            if (rb.velocity.y < .1f)
+            {
                 state = State.falling;
             }
         }
         else if (state == State.falling)
         {
-            if (coll.IsTouchingLayers(ground)){
+            if (coll.IsTouchingLayers(ground))
+            {
                 state = State.idle;
             }
         }
-        else if (Mathf.Abs(rb.velocity.x) > 3f){
+        else if (Mathf.Abs(rb.velocity.x) > 3f)
+        {
             //Moving
             state = State.running;
         }
@@ -112,6 +126,7 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+
 
     /*
     // required functions to make better controls work 
