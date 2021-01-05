@@ -7,11 +7,13 @@ public class PlayerController : MonoBehaviour
     // Start() variables
     private Rigidbody2D rb;
     private Animator anim;
+    private Collider2D coll;
+
+    public int cherries = 0;
 
     // FSM
     private enum State { idle, running, jumping, falling }
     private State state = State.idle;
-    private Collider2D coll;
 
     // Inspector variables
     [SerializeField] private LayerMask ground;
@@ -125,6 +127,15 @@ public class PlayerController : MonoBehaviour
             state = State.idle;
         }
 
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Collectable")
+        {
+            cherries += 1;
+            Destroy(collision.gameObject);
+        }
     }
 
 
