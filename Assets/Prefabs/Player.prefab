@@ -231,8 +231,11 @@ MonoBehaviour:
   ground:
     serializedVersion: 2
     m_Bits: 256
+  CollectableCount: {fileID: 0}
   speed: 5
   jumpForce: 7
+  cherries: 0
+  hurtForce: 7
 --- !u!95 &2499323163228720238
 Animator:
   serializedVersion: 3

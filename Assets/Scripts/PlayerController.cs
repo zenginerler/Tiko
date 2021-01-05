@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,16 +10,17 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private Collider2D coll;
 
-    public int cherries = 0;
-
     // FSM
-    private enum State { idle, running, jumping, falling }
+    private enum State {idle, running, jumping, falling, hurt}
     private State state = State.idle;
 
     // Inspector variables
-    [SerializeField] private LayerMask ground;
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private float jumpForce = 7f;
+    public LayerMask ground;
+    public Text CollectableCount;
+    [SerializeField] private float speed = 6.5f;
+    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private int cherries = 0;
+    [SerializeField] private float hurtForce = 8.5f;
 
 
     /*
@@ -40,8 +42,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        Movement();
-        
+        if (state != State.hurt)
+        {
+            Movement();
+        }
+
         AnimationState();
         anim.SetInteger("state", (int)state);
     }
@@ -68,10 +73,10 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && coll.IsTouchingLayers(ground))
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            state = State.jumping;
+            Jump();
         }
 
+        
         /*
         // better controls from "mix & jam"
         float x = Input.GetAxis("Horizontal");
@@ -99,6 +104,11 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void Jump()
+    {
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        state = State.jumping;
+    }
 
     // Changes animation states according to the player
     private void AnimationState()
@@ -114,6 +124,12 @@ public class PlayerController : MonoBehaviour
         {
             if (coll.IsTouchingLayers(ground))
             {
+                state = State.idle;
+            }
+        }
+        else if (state == State.hurt)
+        {
+            if (Mathf.Abs(rb.velocity.x) <= 3f){
                 state = State.idle;
             }
         }
@@ -134,10 +150,36 @@ public class PlayerController : MonoBehaviour
         if (collision.tag == "Collectable")
         {
             cherries += 1;
+            CollectableCount.text = cherries.ToString();
             Destroy(collision.gameObject);
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            if (state == State.falling)
+            {
+                Destroy(other.gameObject);
+                Jump();
+            }
+            else
+            {
+                state = State.hurt;
+
+                if (other.gameObject.transform.position.x > transform.position.x){
+                    // Enemy is to my right therefore I should be damaged and move left
+                    rb.velocity = new Vector2(-hurtForce, rb.velocity.y);
+
+                }
+                else{
+                    // Enemy is to my left therefore I should be damaged and move right
+                    rb.velocity = new Vector2(hurtForce, rb.velocity.y);
+                }
+            }
+        }
+    }
 
     /*
     // required functions to make better controls work 
