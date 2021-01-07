@@ -5,10 +5,6 @@ using UnityEngine;
 public class Frog : Enemy
 {
 
-    // Start() variables
-    private Rigidbody2D rb;
-    private Collider2D coll;
-
     // FSM
     private enum State {idle, jumping, falling}
     private State state = State.idle;
@@ -26,8 +22,6 @@ public class Frog : Enemy
     protected override void Start()
     {
         base.Start();
-        rb = GetComponent<Rigidbody2D>();
-        coll = GetComponent<Collider2D>();
     }
 
     // Update is called once per frame

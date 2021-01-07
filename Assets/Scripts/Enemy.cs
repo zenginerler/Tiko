@@ -6,17 +6,17 @@ public class Enemy : MonoBehaviour
 {
 
     // Start() variables
-    //private Rigidbody2D rb;
+    protected Rigidbody2D rb;
     protected Animator anim;
-    //private Collider2D coll;
+    protected Collider2D coll;
 
 
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        //rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        //coll = GetComponent<Collider2D>();
+        coll = GetComponent<Collider2D>();
     }
 
     // Update is called once per frame
@@ -28,6 +28,7 @@ public class Enemy : MonoBehaviour
     public void JumpedOn()
     {   
         anim.SetTrigger("death");
+        rb.velocity = Vector2.zero;
     }
 
     private void Death()
