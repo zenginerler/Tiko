@@ -11,9 +11,9 @@ public class Eagle : Enemy
         base.Start();
     }
 
+
     // Update is called once per frame
     void Update()
     {
-        
     }
 }

@@ -17,18 +17,18 @@ public class PlayerController : MonoBehaviour
     // Inspector variables
     public LayerMask ground;
     public Text CollectableCount;
+    public AudioSource cherryFX;
+    public AudioSource footstep;
     [SerializeField] private float speed = 6.5f;
     [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private int cherries = 0;
     [SerializeField] private float hurtForce = 8.5f;
-
+    [SerializeField] private int cherries = 0;
 
     /*
     // better control settings
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
     */
-
 
     // Start is called before the first frame update
     private void Start()
@@ -37,7 +37,6 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
     }
-
 
     // Update is called once per frame
     private void Update()
@@ -51,11 +50,9 @@ public class PlayerController : MonoBehaviour
         anim.SetInteger("state", (int)state);
     }
 
-
-    // Handles inputs of the user
+    // Handles general control inputs of the user
     private void Movement()
     {
-
         // basic player controls
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
@@ -104,6 +101,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    //Handles jump input exclusively
     private void Jump()
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -145,16 +143,19 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    //Handles cherry collection
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Collectable")
         {
             cherries += 1;
+            cherryFX.Play();
             CollectableCount.text = cherries.ToString();
             Destroy(collision.gameObject);
         }
     }
 
+    //Handles interactions with enemies
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.tag == "Enemy")
@@ -182,6 +183,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //plays footstep sound
+    private void Footstep()
+    {
+        footstep.Play();
+    }
+    
+    
     /*
     // required functions to make better controls work 
     private void Walk(Vector2 dir)

@@ -18,11 +18,13 @@ public class Frog : Enemy
     private bool facingLeft = true;
     public LayerMask ground;
 
+
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
     }
+
 
     // Update is called once per frame
     private void Update()
@@ -85,6 +87,7 @@ public class Frog : Enemy
 
 
     }
+
 
     private void AnimationState()
     {
