@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Animator anim;
     private Collider2D coll;
+    private SpriteRenderer spr;
 
     // FSM
     private enum State {idle, running, jumping, falling, hurt}
@@ -16,9 +18,11 @@ public class PlayerController : MonoBehaviour
 
     // Inspector variables
     public LayerMask ground;
-    public Text CollectableCount;
     public AudioSource cherryFX;
     public AudioSource footstep;
+    public Text CherryCount;
+    public Text HealthAmount;
+    [SerializeField] private int health = 3;
     [SerializeField] private float speed = 6.5f;
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float hurtForce = 8.5f;
@@ -36,6 +40,8 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         coll = GetComponent<Collider2D>();
+        spr = GetComponent<SpriteRenderer>();
+        HealthAmount.text = health.ToString();
     }
 
     // Update is called once per frame
@@ -70,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Jump"))
         {
-            RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, 1.3f, ground);
+            RaycastHit2D hit = Physics2D.Raycast(rb.position, Vector2.down, 1.5f, ground);
             if(hit.collider != null)
                 Jump();
         }
@@ -152,8 +158,16 @@ public class PlayerController : MonoBehaviour
         {
             cherries += 1;
             cherryFX.Play();
-            CollectableCount.text = cherries.ToString();
+            CherryCount.text = cherries.ToString();
             Destroy(collision.gameObject);
+        }
+
+        if (collision.tag == "PowerUp")
+        {
+            Destroy(collision.gameObject);
+            spr.color = Color.green;
+            rb.gravityScale = 1;
+            StartCoroutine(ResetPowerUp());
         }
     }
 
@@ -171,6 +185,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 state = State.hurt;
+                HealthHandler();
 
                 if (other.gameObject.transform.position.x > transform.position.x){
                     // Enemy is to my right therefore I should be damaged and move left
@@ -185,12 +200,31 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+    // Reloads the game if player loses all of it's health
+    private void HealthHandler()
+    {
+        health -= 1;
+        HealthAmount.text = health.ToString();
+        if (health <= 0){
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
+
     //plays footstep sound
     private void Footstep()
     {
         footstep.Play();
     }
     
+
+    // Timer for PowerUps
+    private IEnumerator ResetPowerUp(){
+        yield return new WaitForSeconds(2);
+        spr.color = Color.white;
+        rb.gravityScale = 2;
+    }
     
     /*
     // required functions to make better controls work 
