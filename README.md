@@ -12,11 +12,11 @@
 ![demo1](https://user-images.githubusercontent.com/64453575/103874454-c972ea00-5096-11eb-93a1-d20c6fd2e971.png)
 
 
-## Controls
+### Controls
 * Movement 🠖 <kbd>A</kbd> <kbd>D</kbd> <kbd>←</kbd> <kbd>→</kbd>
 * Jump 🠖 <kbd>SPACE</kbd> or <kbd>W</kbd>
 
 
-## Play a Demo
-### WebGL Version 
-https://play.unity.com/mg/other/tiko_play
+### Play a Demo
+##### 🠖 [WebGL Version](https://play.unity.com/mg/other/tiko_play) 🠔
+
